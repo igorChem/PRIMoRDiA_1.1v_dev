@@ -778,19 +778,23 @@ void mopac_files::get_mo_energies(bool beta){
 			nLines++;
 		}
 		buf.close();
-		if ( !beta ) {
+		if ( !beta ){
 			copy( mo_c.begin(),mo_c.end(),back_inserter(molecule->orb_energies) );
 			molecule->MOnmb = molecule->orb_energies.size();
 			m_log->input_message("Number of MO energy levels:");
 			m_log->input_message( int( molecule->orb_energies.size() ) );
+			if ( molecule->MOnmb < molecule->num_of_atoms ){
+				m_log->input_message("Problem in reading molecular energies!");
+				m_log->input_message("Number of MO energy levels:");
+				m_log->input_message( int( molecule->orb_energies.size() ) );
+			}
 		}
 		else {
 			copy( mo_c.begin(),mo_c.end(),back_inserter(molecule->orb_energies_beta) );
+			molecule->MOnmb_beta = molecule->orb_energies_beta.size();
 			m_log->input_message("Number of beta MO energy levels:");
 			m_log->input_message( int( molecule->orb_energies_beta.size() ) );
-			molecule->MOnmb_beta = molecule->orb_energies_beta.size();
 		}
-		
 	}else{
 		string message = "Not possible to open the file: ";
 		message += name_f;
