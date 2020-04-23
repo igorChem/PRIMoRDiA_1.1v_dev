@@ -615,7 +615,7 @@ void mopac_files::get_overlap_m(){
 	
 	unsigned int nAO	= molecule->num_of_ao;
 	int in_indx			= -1;	
-	int fin_indx			= ( ( nAO*(nAO+1) )/2 ) / 10;
+	int fin_indx			=  ( nAO*(nAO+1) )/2 ;
 	int nLines 			= 0;
 	double temp			= 0.0;
 	
@@ -629,9 +629,8 @@ void mopac_files::get_overlap_m(){
 			if ( in_indx == -1) {
 				if ( Line.IF_word( keyword,0,keyword.size() ) ) {
 					in_indx		= nLines;
-					fin_indx	+= nLines+3;
 				}
-			}else if ( in_indx >0 && nLines < fin_indx) {
+			}else if ( in_indx >0 && molecule->m_overlap.size() < fin_indx) {
 				std::stringstream ssline(tmp_line);
 				while ( ssline >> temp ){
 					molecule->m_overlap.push_back(temp);
