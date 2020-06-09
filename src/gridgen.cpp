@@ -440,7 +440,7 @@ void gridgen::calculate_density_orca(){
 void gridgen::calculate_mep_from_charges(){
 	unsigned int x,y,z,i;
 	double xi,yi,zi,xj,yj,zj,r,invR,v = 0.0;
-	double precision 					= 1e-13;
+	double precision 				= 1e-13;
 	
 	omp_set_num_threads(NP);
 	#pragma omp parallel for collapse(3) shared(precision) private(xi,yi,zi,xj,yj,zj,r,invR,x,y,z,i) reduction(+:v)
@@ -601,7 +601,8 @@ Icube gridgen::calc_EBLC_NAS( ){
 /***********************************************************************/
 Icube gridgen::grid_from_atoms(std::vector<double> values){
 	Icube temp	= density;
-	temp 			= temp*0.0;
+	temp 		= temp*0.0;
+	
 	return temp;
 }
 /***********************************************************************

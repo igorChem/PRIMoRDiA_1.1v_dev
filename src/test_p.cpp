@@ -39,12 +39,13 @@ test_p::test_p(){
 	M_logfile = true;
 	
 	M_verbose = true;
-	M_logfile 	=	true;
+	M_logfile =	true;
 	string teste_folder1 = "/home/igorchem/Documents/primordia_data_test/mopac/";
 	string teste_folder2 = "/home/igorchem/Documents/primordia_data_test/gamess/";
 	string teste_folder3 = "/home/igorchem/Documents/primordia_data_test/gaussian/";
 	string teste_folder4 = "/home/igorchem/Documents/primordia_data_test/orca/";
 	string teste_folder5 = "/home/igorchem/Documents/primordia_data_test/others/";
+	string teste_folder6 = "/home/igorchem/ccdir/";
 	
 	pdb_files.push_back(teste_folder1+"1l2y.pdb"); // # 0 
 	pdb_files.push_back(teste_folder1+"1l2yPM7neutro.pdb"); // # 1 
@@ -59,6 +60,7 @@ test_p::test_p(){
 	mopac_aux.push_back(teste_folder1+"benzene.aux");			//#7
 	mopac_aux.push_back(teste_folder1+"benzene_cat.aux");	//#8
 	mopac_aux.push_back(teste_folder1+"benzene_an.aux");		//#9
+	mopac_aux.push_back(teste_folder6+"aligned_human_K_1393_pm7_zy.aux");//#10
 	
 	mopac_mgf.push_back(teste_folder1+"1l2yPM7neutro.mgf");//#0
 	mopac_mgf.push_back(teste_folder1+"trp_lmo.mgf"); 			//#1
@@ -90,6 +92,8 @@ test_p::test_p(){
 	gamess_log.push_back(teste_folder2+"acrolein_gam_an.log"); //#6
 	gamess_log.push_back(teste_folder2+"trp_an_dft.log"); //#7
 	gamess_log.push_back(teste_folder2+"trp_an_dft.log"); //#8
+	
+	
 }
 /**********************************************************************************/
 void test_p::test_primordia_1(){
@@ -116,23 +120,23 @@ void test_p::test_primordia_3(){
 	//testing option 2 of primordia class for mopac
 	dos = true;
 	double ref_coord[3];
-	ref_coord[0] = 0.779;
+	ref_coord[0] = 0.;
 	ref_coord[1] = 0.524;
 	ref_coord[2] = 2.812;
 	primordia mop_a;
+	NP = 1;
 	//mop_a.init_protein_RD(mopac_aux[0].c_str(),"mepEE",40,10,ref_coord,0,pdb_files[0].c_str(),true,"EW","mopac"); // mopac rhf
 	//mop_a.init_protein_RD(mopac_aux[3].c_str(),"mepEE",40,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","mopac"); // mopac lmo
 	//mop_a.init_protein_RD(mopac_aux[3].c_str(),"mepFukui",40,10,ref_coord,10,pdb_files[0].c_str(),true,"BD","mopac"); // mopac lmo
 	//mop_a.init_protein_RD(mopac_aux[1].c_str(),"mepFukui",40,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","mopac"); // mopac lmo
-	//mop_a.init_protein_RD(mopac_aux[2].c_str(),"mepFukui",40,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","mopac"); // mopac lmo
+	mop_a.init_protein_RD(mopac_aux[10].c_str(),"mepFukui",0,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","mopac"); // mopac lmo
 	//mop_a.init_protein_RD(gamess_log[0].c_str(),"mepFukui",40,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","gamess"); // mopac lmo
-	mop_a.init_protein_RD(gamess_log[2].c_str(),"mepFukui",40,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","gamess"); // mopac lmo
+	//mop_a.init_protein_RD(gamess_log[2].c_str(),"mepFukui",40,10,ref_coord,0,pdb_files[0].c_str(),true,"BD","gamess"); // mopac lmo
 	//mop_a.init_protein_RD() // mopac uhf
 	//mop_a.init_protein_RD() // mopac gamess rhf
 	//mop_a.init_protein_RD() // mopac gamess uhf
 	//mop_a.init_protein_RD() // mopac gamess dft
 	//mop_a.init_protein_RD() // mopac gamess dftb ( sem grid )1140
-	
 }
 
 test_p::~test_p(){}

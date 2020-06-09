@@ -187,27 +187,27 @@ local_rd_cnd::local_rd_cnd(local_rd_cnd&& lrd_rhs) noexcept	:
 /***********************************************************************************/
 local_rd_cnd& local_rd_cnd::operator=(local_rd_cnd&& lrd_rhs) noexcept {
 	if( this!=&lrd_rhs){
-		name					= move(lrd_rhs.name);  
-		ed 						= move(lrd_rhs.ed);
-		mep 						= move(lrd_rhs.mep);
-		finite_diff				= move(lrd_rhs.finite_diff);                 
-		charge					= move(lrd_rhs.charge);                          
-		molecule				= move(lrd_rhs.molecule);     
-		EAS						= move(lrd_rhs.EAS);              
-		NAS						= move(lrd_rhs.NAS);             
-		RAS						= move(lrd_rhs.RAS);       
-		dual						= move(lrd_rhs.dual);            
+		name				= move(lrd_rhs.name);  
+		ed 					= move(lrd_rhs.ed);
+		mep 				= move(lrd_rhs.mep);
+		finite_diff			= move(lrd_rhs.finite_diff);                 
+		charge				= move(lrd_rhs.charge);                          
+		molecule			= move(lrd_rhs.molecule);     
+		EAS					= move(lrd_rhs.EAS);              
+		NAS					= move(lrd_rhs.NAS);             
+		RAS					= move(lrd_rhs.RAS);       
+		dual				= move(lrd_rhs.dual);            
 		Softness_Dual		= move(lrd_rhs.Softness_Dual);
 		Hyper_softness		= move(lrd_rhs.Hyper_softness);
-		electron_density 	= move(lrd_rhs.electron_density);
+		electron_density	= move(lrd_rhs.electron_density);
 		hardness_A			= move(lrd_rhs.hardness_A);   
 		hardness_B			= move(lrd_rhs.hardness_B);   
 		hardness_C			= move(lrd_rhs.hardness_C);   
 		hardness_D			= move(lrd_rhs.hardness_D);   
-		multifilic				= move(lrd_rhs.multifilic);         
-		electrophilicity		= move(lrd_rhs.electrophilicity);         
-		relative_EAS			= move(lrd_rhs.relative_EAS);      
-		relative_NAS			= move(lrd_rhs.relative_NAS);  
+		multifilic			= move(lrd_rhs.multifilic);         
+		electrophilicity	= move(lrd_rhs.electrophilicity);         
+		relative_EAS		= move(lrd_rhs.relative_EAS);      
+		relative_NAS		= move(lrd_rhs.relative_NAS);  
 		fukushima			= move(lrd_rhs.fukushima);
 	}       	
 	return *this;
@@ -367,13 +367,15 @@ void local_rd_cnd::calculate_Hardness(const global_rd& grd){
 }
 /*************************************************************************************/
 void local_rd_cnd::write_rd_protein(const Iprotein& prot){
-	std::string temps,temps1,temps2;
+	std::string temps;
 	vector< vector< vector<double> > > res_rd;
 	res_rd.resize( prot.residues.size() );
 	unsigned int i,nof=0;
 	nof = molecule.atoms.size();
 	
 	vector<double> lig_interaction(14);
+	vector<double> avg(14);
+	
 	if ( prot.ligand ){
 		int lig_n = 0;
 		
@@ -399,7 +401,7 @@ void local_rd_cnd::write_rd_protein(const Iprotein& prot){
 				lig_interaction[9]	+= multifilic[j]/r;
 				lig_interaction[10]	+= electrophilicity[j]/r;
 				lig_interaction[11]	+= fukushima[j]/r;
-				lig_interaction[12] 	+= electron_density[j]/r;
+				lig_interaction[12] += electron_density[j]/r;
 				lig_interaction[13]	+= Softness_Dual[j]/r;
 			}
 		}
@@ -430,123 +432,34 @@ void local_rd_cnd::write_rd_protein(const Iprotein& prot){
 			res_rd[i][13][0] += Softness_Dual[cnt];
 			cnt++;
 		}
-	}
-	for(unsigned int i=0;i<prot.residues.size();i++){		
-		res_rd[i][0][1] = res_rd[i][0][0]/prot.residues[i].atom_s;
-		res_rd[i][1][1] = res_rd[i][1][0]/prot.residues[i].atom_s;
-		res_rd[i][2][1] = res_rd[i][2][0]/prot.residues[i].atom_s;
-		res_rd[i][3][1] = res_rd[i][3][0]/prot.residues[i].atom_s;
-		res_rd[i][4][1] = res_rd[i][4][0]/prot.residues[i].atom_s;
-		res_rd[i][5][1] = res_rd[i][5][0]/prot.residues[i].atom_s;
-		res_rd[i][6][1] = res_rd[i][6][0]/prot.residues[i].atom_s;
-		res_rd[i][7][1] = res_rd[i][7][0]/prot.residues[i].atom_s;
-		res_rd[i][8][1] = res_rd[i][8][0]/prot.residues[i].atom_s;
-		res_rd[i][9][1] = res_rd[i][9][0]/prot.residues[i].atom_s;
-		res_rd[i][10][1] = res_rd[i][10][0]/prot.residues[i].atom_s;
-		res_rd[i][11][1] = res_rd[i][11][0]/prot.residues[i].atom_s;
-		res_rd[i][12][1] = res_rd[i][12][0]/prot.residues[i].atom_s;
-		res_rd[i][13][1] = res_rd[i][13][0]/prot.residues[i].atom_s;
-	}
-	cnt = 0;
-	for(unsigned int i=0;i<prot.residues.size();i++){
-		for(unsigned int j=0;j<prot.residues[i].atom_s;j++){
-			if ( j == 0 ) res_rd[i][0][2] = EAS[cnt];
-			else{
-				if ( EAS[cnt] > EAS[cnt-1] ) 
-					res_rd[i][0][2] = EAS[cnt];
-			}
-			if ( j == 0 ) res_rd[i][1][2] = NAS[cnt];
-			else{
-				if ( NAS[cnt] > NAS[cnt-1] ) 
-					res_rd[i][1][2] = NAS[cnt];
-			}
-			if ( j == 0 ) res_rd[i][2][2] = RAS[cnt];
-			else{
-				if ( RAS[cnt] > RAS[cnt-1] ) 
-					res_rd[i][2][2] = RAS[cnt];
-			}
-			if ( j == 0 ) res_rd[i][3][2] = dual[cnt];
-			else{
-				if ( abs(dual[cnt]) > abs(dual[cnt-1]) ) 
-					res_rd[i][3][2] = dual[cnt];
-			}
-			if ( j == 0 ) res_rd[i][4][2] = Hyper_softness[cnt];
-			else{
-				if ( abs(Hyper_softness[cnt]) > abs(Hyper_softness[cnt-1]) ) 
-					res_rd[i][4][2] = Hyper_softness[cnt];
-			}
-			if ( j == 0 ) res_rd[i][5][2] = hardness_A[cnt];
-			else{
-				if ( abs(hardness_A[cnt]) > abs(hardness_A[cnt-1]) ) 
-					res_rd[i][5][2] = hardness_A[cnt];
-			}
-			if ( j == 0 ) res_rd[i][6][2] = hardness_B[cnt];
-			else{
-				if ( abs(hardness_B[cnt]) > abs(hardness_B[cnt-1]) ) 
-					res_rd[i][6][2] = hardness_B[cnt];
-			}
-			if ( j == 0 ) res_rd[i][7][2] = hardness_C[cnt];
-			else{
-				if ( abs(hardness_C[cnt]) > abs(hardness_C[cnt-1]) ) 
-					res_rd[i][7][2] = hardness_C[cnt];
-			}
-			if ( j == 0 ) res_rd[i][8][2] = hardness_D[cnt];
-			else{
-				if ( abs(hardness_D[cnt]) > abs(hardness_D[cnt-1]) ) 
-					res_rd[i][8][2] = hardness_D[cnt];
-			}
-			if ( j == 0 ) res_rd[i][9][2] = multifilic[cnt];
-			else{
-				if ( abs(multifilic[cnt]) > abs(multifilic[cnt-1]) ) 
-					res_rd[i][9][2] = multifilic[cnt];
-			}
-			if ( j == 0 ) res_rd[i][10][2] = electrophilicity[cnt];
-			else{
-				if ( abs(electrophilicity[cnt]) > abs(electrophilicity[cnt-1]) ) 
-					res_rd[i][10][2] = electrophilicity[cnt];
-			}
-			if ( j == 0 ) res_rd[i][11][2] = fukushima[cnt];
-			else{
-				if ( fukushima[cnt] > fukushima[cnt-1] ) 
-					res_rd[i][11][2] = fukushima[cnt];
-			}
-			if ( j == 0 ) res_rd[i][12][2] = electron_density[cnt];
-			else{
-				if ( fukushima[cnt] > electron_density[cnt-1] ) 
-					res_rd[i][12][2] = electron_density[cnt];
-			}
-			if ( j == 0 ) res_rd[i][13][2] = Softness_Dual[cnt];
-			else{
-				if ( abs(Softness_Dual[cnt]) > abs(Softness_Dual[cnt-1]) ) 
-					res_rd[i][13][2] = Softness_Dual[cnt];
-			}
-			cnt++;
-		}
+		avg[0] += res_rd[i][0][0];
+		avg[1] += res_rd[i][1][0];
+		avg[2] += res_rd[i][2][0];
+		avg[3] += res_rd[i][3][0];
+		avg[4] += res_rd[i][4][0];
+		avg[5] += res_rd[i][5][0];
+		avg[6] += res_rd[i][6][0];
+		avg[7] += res_rd[i][7][0];
+		avg[8] += res_rd[i][8][0];
+		avg[9] += res_rd[i][9][0];
+		avg[10] += res_rd[i][10][0];
+		avg[11] += res_rd[i][11][0];
+		avg[12] += res_rd[i][12][0];
+		avg[13] += res_rd[i][13][0];
 	}
 	
 	if ( finite_diff ) {
 		temps  = name+"pro.lrd";
-		temps1 = name+"pro_mean.lrd";
-		temps2 = name+"pro_max.lrd";
 	}else{
 		temps  = name+"residues.lrd";
-		temps1 = name+"residues_mean.lrd";
-		temps2 = name+"residues_max.lrd";
 	}
-	const char* names  = temps.c_str();
-	const char* names1 = temps1.c_str();
-	const char* names2 = temps2.c_str();
-	std::ofstream lrd_file(names);
-	std::ofstream lrd_file1(names1);
-	std::ofstream lrd_file2(names2);
-	std::ofstream r_script_lrd;
 
+	const char* names  = temps.c_str();
+	std::ofstream lrd_file(names);
+	std::ofstream r_script_lrd;
+	
 	lrd_file.precision(8);
 	lrd_file  << std::fixed;
-	lrd_file1.precision(8);
-	lrd_file1 << std::fixed;
-	lrd_file2.precision(8);
-	lrd_file2 << std::fixed;
 	
 	lrd_file << "res EAS NAS RAS Dual Softness Hardness_A Hardness_B Hardness_C Hardness_D  Multiphilic Electrophilic Fukushima Electron_Density Softness_dual\n";
 	for(unsigned int i=0;i<prot.residues.size();i++){
@@ -569,21 +482,39 @@ void local_rd_cnd::write_rd_protein(const Iprotein& prot){
 				 << "\n";
 	}
 	if ( prot.ligand ){
-		lrd_file << (i+1)										<< ""
-					 << "ligand_interaction_sum"		<< " "
-					<<  lig_interaction[0]					<< " " 
-					<<  lig_interaction[1]					<< " " 
-					<<  lig_interaction[2]					<< " " 
-					<<  lig_interaction[3]					<< " " 
-					<<  lig_interaction[4]					<< " " 
-					<<  lig_interaction[5]					<< " " 
-					<<  lig_interaction[6]					<< " " 
-					<<  lig_interaction[7]					<< " " 
-					<<  lig_interaction[8]					<< " "
-					<<  lig_interaction[9]					<< " "
-					<<  lig_interaction[10]				<< " "
-					<< "\n";
+		lrd_file << (i+1)						<< ""
+					 << "ligand_interaction_sum"<< " "
+					<<  lig_interaction[0]		<< " " 
+					<<  lig_interaction[1]		<< " " 
+					<<  lig_interaction[2]		<< " " 
+					<<  lig_interaction[3]		<< " " 
+					<<  lig_interaction[4]		<< " " 
+					<<  lig_interaction[5]		<< " " 
+					<<  lig_interaction[6]		<< " " 
+					<<  lig_interaction[7]		<< " " 
+					<<  lig_interaction[8]		<< " "
+					<<  lig_interaction[9]		<< " "
+					<<  lig_interaction[10];
 	}
+	for(int i=0;i<avg.size();i++){
+		avg[i] /= prot.num_of_res;
+	}
+	lrd_file<<  "average "
+			<<  avg[0]	<< " " 
+			<<  avg[1]	<< " " 
+			<<  avg[2]	<< " " 
+			<<  avg[3]	<< " " 
+			<<  avg[4]	<< " " 
+			<<  avg[5]	<< " " 
+			<<  avg[6]	<< " " 
+			<<  avg[7]	<< " " 
+			<<  avg[8]	<< " "
+			<<  avg[9]	<< " "
+			<<  avg[10]	<< " "
+			<<  avg[11]	<< " "
+			<<  avg[12]	<< " "
+			<<  avg[13];
+	
 	lrd_file.close();
 	/*
 	lrd_file1 << "res EAS NAS RAS Dual Softness Hardness Multiphilic Electrophilic Fukushima Electron_Density Softness_dual\n";
@@ -594,7 +525,7 @@ void local_rd_cnd::write_rd_protein(const Iprotein& prot){
 				 << res_rd[i][1][1]				<< " " 
 				 << res_rd[i][2][1]				<< " " 
 				 << res_rd[i][3][1]				<< " " 
-				 << res_rd[i][4][1] 				<< " " 
+				 << res_rd[i][4][1] 			<< " " 
 				 << res_rd[i][5][1]				<< " " 
 				 << res_rd[i][6][1]				<< " " 
 				 << res_rd[i][7][1]				<< " " 

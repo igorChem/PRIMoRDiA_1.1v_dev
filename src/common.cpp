@@ -19,10 +19,10 @@
 //Including standard statements.
 using std::string;
 /*********************************************************************************/
-bool dos				= false;
+bool dos			= false;
 bool extra_RD		= false;
 bool pymol_script	= false;
-unsigned int NP	= omp_get_max_threads();
+unsigned int NP		= omp_get_max_threads();
 /*********************************************************************************/
 Itimer chronometer;
 std::unique_ptr<Ilog> m_log ( new Ilog() );

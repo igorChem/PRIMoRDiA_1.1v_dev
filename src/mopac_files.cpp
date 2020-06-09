@@ -35,22 +35,22 @@ using std::stod;
 
 //======================================================================
 mopac_files::mopac_files()		:
-	RHF(true)							,
-	LMO(false)							,
-	f_chg(0)								,
-	band(0)								,
+	RHF(true)					,
+	LMO(false)					,
+	f_chg(0)					,
+	band(0)						,
 	name_f("no_name")			,
-	type("no_type")					,
-	buffer( new Ibuffer() )			,
+	type("no_type")				,
+	buffer( new Ibuffer() )		,
 	molecule( new Imolecule() ){
 }
 /***************************************************************************************/
 mopac_files::mopac_files(const char* file_name, unsigned int MOband):
-	molecule( new Imolecule() )															,
-	buffer( new Ibuffer() )																		,
-	LMO(false)																						,
-	RHF(true)																						,
-	band(MOband)																				{
+	molecule( new Imolecule() )										,
+	buffer( new Ibuffer() )											,
+	LMO(false)														,
+	RHF(true)														,
+	band(MOband)													{
 	
 	unsigned int i,j;
 	
@@ -119,6 +119,12 @@ mopac_files::mopac_files(const char* file_name, unsigned int MOband):
 			else if ( buffer->lines[i].IF_word("QUARTET",1,7) )	RHF =false; 
 			else if ( buffer->lines[i].IF_word("CHARGE",1,6) )	f_chg = stoi(buffer->lines[i].words[5]); 
 		}
+	}
+		
+	else if (check_file_ext(".mgf",file_name) ){
+		type = "MGF";
+		name_f = file_name;
+		molecule->name = remove_extension(name_f);
 	}else{
 		cout << "Warning! The file has imcompatible extension name with mopac files!" << endl;
 		m_log->input_message("Warning! The file has imcompatible extension name with mopac files!");
@@ -198,6 +204,7 @@ void mopac_files::parse_aux(){
 	
 	molecule->get_ao_number();
 	
+	omp_set_num_threads(NP);
 	#pragma omp parallel
 	{
 		#pragma omp single nowait 
@@ -486,10 +493,10 @@ void mopac_files::parse_mgf(){
 	int k   = 0;
 	
 	
-	for(int i=0;i<orbN_beta.size();i++){		
+	for(int i=0;i<orbN_beta.size();i++){
 		int fin_ind = 0;
 		if ( i==orbN_beta.size()-1 ) fin_ind = buffer->nLines;
-		else fin_ind = orbN_beta[i+1];		
+		else fin_ind = orbN_beta[i+1];
 		for(int j=orbN_beta[i];j<fin_ind;j++){
 			if ( j == orbN_beta[i] ){
 				molecule->occupied_beta.push_back( buffer->lines[j].pop_int(1) );
@@ -615,7 +622,7 @@ void mopac_files::get_overlap_m(){
 	
 	unsigned int nAO	= molecule->num_of_ao;
 	int in_indx			= -1;	
-	int fin_indx			=  ( nAO*(nAO+1) )/2 ;
+	int fin_indx			= ( ( nAO*(nAO+1) )/2 ) ;
 	int nLines 			= 0;
 	double temp			= 0.0;
 	
@@ -650,27 +657,21 @@ void mopac_files::get_overlap_m(){
 void mopac_files::get_mo(bool beta){
 	
 	string keyword		= "EIGENVECTORS[";
-	if ( LMO ) keyword	= "LMO_VECTORS[";
-	if (!RHF) {keyword	= "ALPHA_EIGENVECTORS[";}
-	if ( beta ) {keyword	= "BETA_EIGENVECTORS[";}
+	if (LMO)keyword		= "LMO_VECTORS[";
+	if (!RHF){keyword	= "ALPHA_EIGENVECTORS[";}
+	if (beta){keyword	= "BETA_EIGENVECTORS[";}
 	
-	unsigned int nLines		= 0;
-	double temp 					= 0.0;
-	unsigned int nMO			= 0;
-	unsigned int nAO			= molecule->num_of_ao;
-	int nHomo					= molecule->num_of_electrons/2 - 1;
-	int nLumo						= nHomo+1;
-	unsigned int nMO_in		= 0;
-	unsigned int nMO_out	= nAO*nAO;
-	int in_indx					= -1;
-	int fin_indx					= nAO*nAO/10;
+	unsigned int nLines	= 0;
+	double temp 		= 0.0;
+	unsigned int nMO	= 0;
+	unsigned int nAO	= molecule->num_of_ao;
+	int nHomo			= molecule->num_of_electrons/2 - 1;
+	int nLumo			= nHomo+1;
+	unsigned int nMO_out= nAO*nAO;
+	int in_indx			= -1;
+	int fin_indx		= nAO*nAO/10;
 	std::vector<double> mo_c;
-	
-	if (band == 0){
-		nMO_in = 0;
-		nMO_out = nAO*nAO;
-	}
-		
+
 	char tmp_line[500];
 	string tmpt;
 	
@@ -680,25 +681,17 @@ void mopac_files::get_mo(bool beta){
 			buf.getline(tmp_line,500);
 			Iline Line(tmp_line);
 			if ( in_indx == -1 ){
-				if ( Line.IF_word( keyword,0,keyword.size() ) ) {
+				if ( Line.IF_word( keyword,0,keyword.size() ) ){
 					in_indx = nLines;
-					fin_indx += nLines +1;
-					tmpt = Line.words[0].substr(keyword.size(),Line.words[0].size());
-					tmpt = tmpt.substr(0,tmpt.size()-2);
-					if ( nAO != sqrt( stoi(tmpt) ) ){
-						nAO       = sqrt( stoi(tmpt) );
-						nMO_in  = 0;
-						nMO_out = nAO*nAO;
-					}
 				}
-			}else{
+			}else if ( in_indx > 0 && nMO < nMO_out){
 				std::stringstream ssline(tmp_line);
-				while (  ssline >> temp ){
-					if ( nMO >= nMO_in && nMO < nMO_out ){
-						mo_c.push_back(temp);
-					}
+				while ( ssline >> temp ){
+					mo_c.push_back(temp);
 					nMO++;
 				}
+			}else{
+				break;
 			}
 			nLines++;
 		}
@@ -726,26 +719,17 @@ void mopac_files::get_mo_energies(bool beta){
 	
 	string keyword		= "EIGENVALUES[";
 	if (!RHF) {keyword	= "ALPHA_EIGENVALUES[";}
-	if ( beta ) {keyword	= "BETA_EIGENVALUES[";}
-	if ( LMO) {keyword = "LMO_ENERGY_LEVELS[";}
+	if ( beta ) {keyword= "BETA_EIGENVALUES[";}
+	if ( LMO) {keyword	= "LMO_ENERGY_LEVELS[";}
 	
 	unsigned int nLines		= 0;
-	double temp 					= 0.0;
-	unsigned int nMO			= 0;
-	unsigned int nAO			= molecule->num_of_ao;
-	int nHomo					= molecule->num_of_electrons/2 - 1;
-	int nLumo						= nHomo+1;
-	unsigned int nMO_in		= 0;
-	unsigned int nMO_out 	= nAO;
-	int in_indx					= -1;
-	int fin_indx					= nAO/10;
+	double temp 			= 0.0;
+	unsigned int nMO		= 0;
+	unsigned int nAO		= molecule->num_of_ao;
+	int in_indx				= -1;
+	int fin_indx			= nAO/10;
 	std::vector<double> mo_c;
 	
-	if (band == 0){
-		nMO_in = 0;
-		nMO_out = nAO;
-	}
-		
 	char tmp_line[500];
 	string tmpt;
 	
@@ -762,23 +746,19 @@ void mopac_files::get_mo_energies(bool beta){
 					tmpt = tmpt.substr(0,tmpt.size()-2);
 					if ( nAO != stoi(tmpt)  ){
 						m_log->input_message("The molecular orbitals set are imcomplete!");
-						nMO_in	= 0;
-						nMO_out	= stoi(tmpt);
 					}
 				}
-			}else{
+			}else if ( in_indx > 0 && mo_c.size() < nAO ){
 				std::stringstream ssline(tmp_line);
-				while (  ssline >> temp ){
-					if ( nMO >= nMO_in && nMO < nMO_out ){
-						mo_c.push_back(temp);
-					}
-					nMO++;
+				while ( ssline >> temp ){
+					mo_c.push_back(temp);
 				}
+				nMO++;
 			}
 			nLines++;
 		}
 		buf.close();
-		if ( !beta ){
+		if ( !beta ) {
 			copy( mo_c.begin(),mo_c.end(),back_inserter(molecule->orb_energies) );
 			molecule->MOnmb = molecule->orb_energies.size();
 			m_log->input_message("Number of MO energy levels:");
@@ -787,14 +767,19 @@ void mopac_files::get_mo_energies(bool beta){
 				m_log->input_message("Problem in reading molecular energies!");
 				m_log->input_message("Number of MO energy levels:");
 				m_log->input_message( int( molecule->orb_energies.size() ) );
+				if ( LMO ){
+					m_log->input_message("mozyme run");
+					m_log->input_message(keyword);
+				}
 			}
 		}
 		else {
 			copy( mo_c.begin(),mo_c.end(),back_inserter(molecule->orb_energies_beta) );
-			molecule->MOnmb_beta = molecule->orb_energies_beta.size();
 			m_log->input_message("Number of beta MO energy levels:");
 			m_log->input_message( int( molecule->orb_energies_beta.size() ) );
+			molecule->MOnmb_beta = molecule->orb_energies_beta.size();
 		}
+		
 	}else{
 		string message = "Not possible to open the file: ";
 		message += name_f;

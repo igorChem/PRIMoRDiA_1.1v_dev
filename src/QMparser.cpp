@@ -45,6 +45,9 @@ Imolecule QMparser::get_molecule(unsigned int mob){
 			file_obj.parse_out();
 			file_obj.parse_mgf();
 		}
+		else if (file_obj.type == "MGF"){
+			file_obj.parse_mgf();
+		}
 		return *file_obj.molecule;
 	}else if (program == "gamess"){
 		gamess_files file_obj(name_f);

@@ -33,22 +33,22 @@ interface::interface():
 }
 /***********************************************************************/
 interface::interface(int argc, char** argv):
-	m_argc(argc)												{
-		
+	m_argc(argc)							{
+
 	for(int i =0;i<m_argc;i++){
 		m_argv.emplace_back(argv[i]);
 	}
 	runtyp = m_argv[1];
 	
 	time_t now	= time(0);
-	char* dt		= ctime(&now);
+	char* dt	= ctime(&now);
 	cout << "Starting PRIMoRDiA software! "	<< endl;
-	cout << "Calculations starting at: "				<< dt << endl;
+	cout << "Calculations starting at: "	<< dt << endl;
 	
 	for(int i=0;i<m_argc;i++){
-		if      ( m_argv[i] == "-np")			NP				= stoi(m_argv[i+1]);
+		if      ( m_argv[i] == "-np")		NP			= stoi(m_argv[i+1]);
 		else if ( m_argv[i] == "-verbose")	M_verbose 	= true;
-		else if ( m_argv[i] == "-log")			M_logfile		= true;
+		else if ( m_argv[i] == "-log")			M_logfile= true;
 	}
 	
 	string file_name1;
@@ -75,16 +75,16 @@ void interface::run(){
 	}
 	else if ( runtyp == "-mo" ){
 		m_log->input_message("You are using PRIMoRDiA for generation of molecular orbital scalar field cube file!\n");
-		unique_ptr<QMparser> qmfile ( new QMparser(m_argv[2].c_str(),m_argv[4]) );
+		unique_ptr<QMparser> qmfile ( new QMparser(m_argv[2].c_str(),m_argv[5]) );
 		Imolecule molecule ( move(qmfile->get_molecule(0) ) );
 		qmfile.reset(nullptr);
 		m_log->input_message("You are using PRIMoRDiA for generation of molecular orbital scalar field cube file!\n");
 		unique_ptr<gridgen> main_grid( new gridgen( stoi(m_argv[3]),move(molecule) ) );
-		if ( strcmp(m_argv[4].c_str() ,"orca" ) ) main_grid->calculate_orb_orca( stoi(m_argv[4]),false );
+		if ( m_argv[5] == "orca"  ) main_grid->calculate_orb_orca( stoi(m_argv[4]),false );
 		else { 
 			main_grid->calculate_orb( stoi(m_argv[4].c_str()),false );
-			main_grid->write_grid();
 		}
+		main_grid->write_grid();
 	}
 	else if ( runtyp == "-ed" ){
 		m_log->input_message("You are using PRIMoRDiA for generation of total electron density scalar field cube file!\n");
@@ -92,8 +92,10 @@ void interface::run(){
 		Imolecule molecule ( move(qmfile->get_molecule(0) ) );
 		qmfile.reset(nullptr);
 		unique_ptr<gridgen> main_grid( new gridgen( stoi(m_argv[3].c_str() ), move(molecule) ) );
-		if ( strcmp(m_argv[4].c_str() ,"orca" ) ) {main_grid->calculate_density_orca(); }
-		else { main_grid->calculate_density(); }
+		if ( m_argv[4].c_str() == "orca" ) {main_grid->calculate_density_orca(); }
+		else { 
+			main_grid->calculate_density();
+		}
 		main_grid->write_grid();
 	}
 	else if ( runtyp == "-cp"){
@@ -175,7 +177,7 @@ void interface::run(){
 		double similarity = cub1.similarity_index(cub2,"default");
 		cout << "Similarity index: " << similarity << endl;
 	}
-	else if ( runtyp == "-int "){
+	else if ( runtyp == "-int"){
 		Icube cube(m_argv[2].c_str());
 		cout << cube.calc_cube_integral() << endl;
 	}
@@ -195,19 +197,20 @@ void interface::write_help(){
 				<< "The program must be run as follows:\n"
 				<< "/path/to/executable [option run] [file_name] [other options] \n"
 				<< "options run:\n"
-				<< "-help : Display this help message\n"
+				<< "--help/-h : Display this help message\n"
 				<< "-f    : Reactivity descriptors run option\n"
 				<< "-ed   : Electron density cube file generation run option\n"
 				<< "-mo   : Molecular Orbital cube file generation run option\n"
+				<< "-input: Produce input from the name list in the current folder\n"
 				//<< "-cp   : Electron density complement\n"
 				//<< "-lcp  : Log of the electron density complement\n"
-				//<< "-cubed: cube file differences and similarity index calculation\n"
+				<< "-cubed: cube file differences and similarity index calculation\n"
 				<< "-cdiff: Calculates the similarity index from a list of cube files\n"
 				//"-int  : Calculates the integral of the cube file\n"
 				<< "Generic options is the options must be placed after all the other arguments\n"
 				<< "Generic options:\n"
 				<< "-np [n] : program runs using n threads\n"
-				<< "-log    : program produce a log file of its operations\n"
+				<< "-log    : program produces a log file of its operations\n"
 				<< "-verbose: program prints to the console messages about its operations\n"
 				<< endl;
 }
@@ -227,18 +230,18 @@ void interface::write_input(){
 	box[0] = 0;
 	box[1] = 0;
 	box[2] = 0;
-	std::string lh						= "none";
-	std::string program			= "none ";
-	std::string mep					= "";
+	std::string lh			= "none";
+	std::string program		= "none ";
+	std::string mep			= "";
 	std::string band_method	= "";
-	int band							= 0;
+	int band				= 0;
 	for( int i=0;i<m_argc;i++){
 		if 			( m_argv[i] == "-op" )	option	= stoi(m_argv[i+1]);
-		else if	( m_argv[i] == "-p" )	program= m_argv[i+1];
-		else if	( m_argv[i] == "-grid") grid		= stoi(m_argv[i+1]); 
-		else if	( m_argv[i] == "-lh") 	lh			= m_argv[i+1]; 
-		else if	( m_argv[i] == "-mep") mep		= "mep";
-		else if	( m_argv[i] == "-band") band	= stoi(m_argv[i+1]);
+		else if	( m_argv[i] == "-p" )		program	= m_argv[i+1];
+		else if	( m_argv[i] == "-grid")		grid	= stoi(m_argv[i+1]); 
+		else if	( m_argv[i] == "-lh")		lh		= m_argv[i+1]; 
+		else if	( m_argv[i] == "-mep")		mep		= "mep";
+		else if	( m_argv[i] == "-band")		band	= stoi(m_argv[i+1]);
 		else if	( m_argv[i] == "-bandmethod") band_method = (m_argv[i+1]);
 		else if	( m_argv[i] == "-box") {
 			box[0] = stod(m_argv[i+1]); 
@@ -320,9 +323,9 @@ void interface::write_input(){
 					inp_file << option << " " << fnames[i] << " " <<	lh << " " << grid << " " << program << " " << mep << endl;
 				if ( option == 2 ){
 					inp_file << option	<< " " << fnames[i] 
-								<< " "		<<	change_extension(fnames[i].c_str(),"_cat.out")	<< " "
-								<< " "		<<	change_extension(fnames[i].c_str(),"_an.out")	<< " "
-								<< lh			<<	" " << grid 	<< " " << 1 << " " << program << " " << mep << endl;
+								<< " "	<<	change_extension(fnames[i].c_str(),"_cat.out")	<< " "
+								<< " "	<<	change_extension(fnames[i].c_str(),"_an.out")	<< " "
+								<< lh	<<	" " << grid 	<< " " << 1 << " " << program << " " << mep << endl;
 				}
 				if ( option == 3 ){
 					inp_file << option << " " << fnames[i] << " " <<	lh << " " << grid << " " << band << " " << " "
