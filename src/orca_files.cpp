@@ -47,19 +47,19 @@ orca_files::orca_files(const char* file_name)	:
 void orca_files::parse_out(){
 	m_log->input_message("Starting to parse out file from ORCA.");
 	
-	unsigned i,j,l		= 0;
-	int in_coords		= 0;
+	unsigned i,j,l	= 0;
+	int in_coords	= 0;
 	int fin_coords	= 0;
 	int orbs_in		= 0;
-	int orbs_fin		= 0;
-	int orbs_in_b		= 0;
+	int orbs_fin	= 0;
+	int orbs_in_b	= 0;
 	int orbs_fin_b	= 0;
-	int chg_in			= 0;
+	int chg_in		= 0;
 	int chg_fin		= 0;
-	int mo_in			= 0;
-	int mo_fin			= 0;
-	int ov_in			= 0;
-	int ov_fin			= 0;
+	int mo_in		= 0;
+	int mo_fin		= 0;
+	int ov_in		= 0;
+	int ov_fin		= 0;
 	
 	vector<int> basis_in;
 	vector<int> basis_fin;
@@ -380,89 +380,7 @@ void orca_files::get_overlap(int ov_in,int ov_fin){
 	}
 
 }
-/*****************************************************************/
-void orca_files::parse_molden(){
-	
-	unsigned int i,j,k;
-	int at_in		= 0;
-	int at_fin		= 0;
-	int gto_in		= 0;
-	int gto_fin		= 0;
-	int mo_in		= 0;
-	int n_gto		= 0;
-	int n_at_gto	= 0;
-	
-	buffer.reset( new Ibuffer (name_f,true) );
-	for (i=0;i<buffer->nLines;i++){
-		if ( buffer->lines[i].IF_word("[Atoms]",0,7) ){
-			at_in = i;
-		}
-		else if ( buffer->lines[i].IF_word("[GTO]",0,5) ){
-			at_fin	= i;
-			gto_in	= i;
-		}
-		else if ( buffer->lines[i].IF_word("[MO]",0,4) ){
-			gto_fin	=i;
-			mo_in	=i;
-			break;
-		}
-	}
-	for(i=0;i<buffer->nLines-1;i++){
-		if ( i > at_in && i < at_fin ){
-			double xx, yy, zz;
-			xx = buffer->lines[i].get_double(3);
-			yy = buffer->lines[i].get_double(4);
-			zz = buffer->lines[i].get_double(5);
-			string type_= buffer->lines[i].get_string(0);
-			molecule->add_atom(xx,yy,zz,type_);
-		}
-		else if ( i > gto_in && i < gto_fin ){
-			if ( buffer->lines[i].words[0] == "s" ){
-				Iaorbital orb;
-				orb.gto				= true;
-				orb.symmetry	= "S";
-				n_gto				= buffer->lines[i].get_int(1);
-				if ( buffer->lines[i-1].words[0].size() == 1 ){
-					n_at_gto			= buffer->lines[i-1].get_int(0);
-				}
-				for(j=0;j<n_gto;j++){
-					orb.add_primitive(buffer->lines[i+j+1].get_double(0),buffer->lines[i+j+1].get_double(1));
-				}
-				molecule->atoms[n_at_gto-1].add_orbital(orb);
-			}
-			else if ( buffer->lines[i].words[0] == "p"){
-				Iaorbital orbX,orbY,orbZ;
-				orbX.gto			= true;
-				orbX.symmetry	= "PX";
-				n_gto				= buffer->lines[i].get_int(1);
-				for(j=0;j<n_gto;j++){
-					orbX.add_primitive(buffer->lines[j+i+1].get_double(0),buffer->lines[j+i+1].get_double(1));
-				}
-				orbY = orbZ = orbX;
-				orbX.powx		= 1;
-				orbY.powy			= 1;
-				orbZ.powz			= 1;
-				orbY.symmetry	= "PY";
-				orbZ.symmetry	= "PZ";
-				molecule->atoms[n_at_gto-1].add_orbital(orbX);
-				molecule->atoms[n_at_gto-1].add_orbital(orbY);
-				molecule->atoms[n_at_gto-1].add_orbital(orbZ);
-			}
-		}
-		else if( i  > mo_in ){
-			if ( buffer->lines[i].words[0] == "Ene=" ){
-				molecule->orb_energies.push_back( buffer->lines[i].get_double(1) );
-				molecule->MOnmb++;
-			}
-			else if (buffer->lines[i].words[0] == "Occup=" ) {
-				molecule->occupied.push_back( buffer->lines[i].get_int(1) );
-				molecule->num_of_electrons += buffer->lines[i].get_int(1);
-			}
-			else if ( buffer->lines[i].words[0] == "Spin=" ) {continue;}
-			else	molecule->coeff_MO.push_back( buffer->lines[i].get_double(1) ); 
-		}
-	}
 
-}
+
 //=============================================
 orca_files::~orca_files(){}

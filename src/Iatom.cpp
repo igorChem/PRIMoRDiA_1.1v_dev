@@ -48,7 +48,7 @@ Iatom::Iatom(double x	,
 	atomicN(0)				,
 	norb(0)						{
 		
-	atomicN 		= get_atomic_number(element); 
+	atomicN 	= get_atomic_number(element); 
 	atomic_mass = get_atom_mass(element);
 }
 /*******************************************************************************************/

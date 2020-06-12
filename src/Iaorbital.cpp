@@ -69,10 +69,10 @@ Iprimitive::~Iprimitive(){}
 ///////////////////////////////////////////////////////////////////////////////
 /*****************************************************************************/
 Iaorbital::Iaorbital():
-	shell(1)				,
+	shell(1)			,
 	gto(false)			,
 	spherical(false)	,
-	symmetry("S")	,
+	symmetry("S")		,
 	n_factor(0.0)		,
 	alpha(0.0)			,
 	powx(0)				,
@@ -81,17 +81,17 @@ Iaorbital::Iaorbital():
 }
 /*****************************************************************************/
 Iaorbital::Iaorbital(unsigned int level	,
-							string sym			,
-							double coef)			:
-	shell(level)										,
-	gto(false)										,
-	symmetry( move(sym) )					,
-	spherical(false)								,
-	n_factor(0.0)									,
-	alpha(coef)									,
-	powx(0)											,
-	powy(0)											,
-	powz(0)											{
+							string sym	,
+							double coef):
+	shell(level)						,
+	gto(false)							,
+	symmetry( move(sym) )				,
+	spherical(false)					,
+	n_factor(0.0)						,
+	alpha(coef)							,
+	powx(0)								,
+	powy(0)								,
+	powz(0)								{
 	
 	if (symmetry == "S"){
 		powx = 0; 
@@ -137,21 +137,21 @@ Iaorbital::Iaorbital(unsigned int level	,
 }
 /*****************************************************************************/
 Iaorbital::Iaorbital(const Iaorbital& rhs_orb):
-		shell(rhs_orb.shell)							,
-		gto(rhs_orb.gto)									,
+		shell(rhs_orb.shell)					,
+		gto(rhs_orb.gto)						,
 		symmetry(rhs_orb.symmetry)				,
-		spherical(rhs_orb.spherical)				,
-		n_factor(rhs_orb.n_factor)					,
-		alpha(rhs_orb.alpha)							, 
-		powx(rhs_orb.powx)							,
-		powy(rhs_orb.powy)							, 
-		powz(rhs_orb.powz)							,
-		gtos(rhs_orb.gtos)								{
+		spherical(rhs_orb.spherical)			,
+		n_factor(rhs_orb.n_factor)				,
+		alpha(rhs_orb.alpha)					, 
+		powx(rhs_orb.powx)						,
+		powy(rhs_orb.powy)						, 
+		powz(rhs_orb.powz)						,
+		gtos(rhs_orb.gtos)						{
 }
 /*****************************************************************************/
-Iaorbital& Iaorbital::operator=(const Iaorbital& rhs_orb){	
+Iaorbital& Iaorbital::operator=(const Iaorbital& rhs_orb){
 	if( this!=&rhs_orb ){
-		shell			= rhs_orb.shell;
+		shell		= rhs_orb.shell;
 		gto			= rhs_orb.gto;
 		symmetry	= rhs_orb.symmetry;
 		spherical	= rhs_orb.spherical;
@@ -159,23 +159,23 @@ Iaorbital& Iaorbital::operator=(const Iaorbital& rhs_orb){
 		alpha		= rhs_orb.alpha;
 		powx		= rhs_orb.powx;
 		powy		= rhs_orb.powy;
-		powz			= rhs_orb.powz;
-		gtos			= rhs_orb.gtos;
+		powz		= rhs_orb.powz;
+		gtos		= rhs_orb.gtos;
 	}
 	return *this;
 }
 /****************************************************************************************/
 Iaorbital::Iaorbital(Iaorbital&& rhs_orb) noexcept :
-	shell(rhs_orb.shell)										,
-	gto(rhs_orb.gto)												,
+	shell(rhs_orb.shell)							,
+	gto(rhs_orb.gto)								,
 	symmetry( move(rhs_orb.symmetry) )				,
-	spherical( move(rhs_orb.spherical) )				,
-	n_factor(rhs_orb.n_factor)								,
-	alpha(rhs_orb.alpha)										,
-	powx(rhs_orb.powx)										,
-	powy(rhs_orb.powy)										,
-	powz(rhs_orb.powz)										,
-	gtos( move(rhs_orb.gtos) )								{
+	spherical( move(rhs_orb.spherical) )			,
+	n_factor(rhs_orb.n_factor)						,
+	alpha(rhs_orb.alpha)							,
+	powx(rhs_orb.powx)								,
+	powy(rhs_orb.powy)								,
+	powz(rhs_orb.powz)								,
+	gtos( move(rhs_orb.gtos) )						{
 }
 /****************************************************************************************/
 Iaorbital& Iaorbital::operator=(Iaorbital&& rhs_orb) noexcept {

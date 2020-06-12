@@ -40,11 +40,11 @@ test_p::test_p(){
 	
 	M_verbose = true;
 	M_logfile =	true;
-	string teste_folder1 = "/home/igorchem/Documents/primordia_data_test/mopac/";
+	string teste_folder1 = "/home/igorchem/primordia-code/primordia_data_test/mopac/";
 	string teste_folder2 = "/home/igorchem/Documents/primordia_data_test/gamess/";
 	string teste_folder3 = "/home/igorchem/Documents/primordia_data_test/gaussian/";
 	string teste_folder4 = "/home/igorchem/Documents/primordia_data_test/orca/";
-	string teste_folder5 = "/home/igorchem/Documents/primordia_data_test/others/";
+	string teste_folder5 = "/home/igorchem/primordia-code/PRIMoRDiA1.0v/data_test/others/";
 	string teste_folder6 = "/home/igorchem/ccdir/";
 	
 	pdb_files.push_back(teste_folder1+"1l2y.pdb"); // # 0 
@@ -92,7 +92,7 @@ test_p::test_p(){
 	gamess_log.push_back(teste_folder2+"acrolein_gam_an.log"); //#6
 	gamess_log.push_back(teste_folder2+"trp_an_dft.log"); //#7
 	gamess_log.push_back(teste_folder2+"trp_an_dft.log"); //#8
-	
+	molden.push_back(teste_folder5+"alanina.molden");
 	
 }
 /**********************************************************************************/
@@ -138,6 +138,11 @@ void test_p::test_primordia_3(){
 	//mop_a.init_protein_RD() // mopac gamess dft
 	//mop_a.init_protein_RD() // mopac gamess dftb ( sem grid )1140
 }
+/****************************************************************/
+void test_p::test_int_molden(){
+	QMparser parse_terachem(molden[0].c_str(),"terachem");
+	parse_terachem.get_molecule(0);
+};
 
 test_p::~test_p(){}
 ///////////////////////////////////////////////////////////////////////////////////////

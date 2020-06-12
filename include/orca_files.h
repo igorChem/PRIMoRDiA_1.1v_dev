@@ -39,7 +39,6 @@ class orca_files{
 		orca_files& operator=(const orca_files& rhs) = delete;
 		void parse_out();
 		void get_overlap(int ov_in, int ov_fin);
-		void parse_molden();
 		
 };
 //===================================================

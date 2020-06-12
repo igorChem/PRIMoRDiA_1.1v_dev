@@ -219,8 +219,8 @@ void interface::test_run(){
 	test_p testlib;
 	//testlib.test_primordia_1();
 	//testlib.test_primordia_2();
-	testlib.test_primordia_3();
-	
+	//testlib.test_primordia_3();
+	testlib.test_int_molden();
 }
 /***********************************************************************/
 void interface::write_input(){

@@ -18,6 +18,7 @@
 #include "../include/orca_files.h"
 #include "../include/gaussian_files.h"
 #include "../include/mopac_files.h"
+#include "../include/terachem_files.h"
 //-------------------------------------------------------
 // Aliases for standard c++ scope functions
 using std::cout;
@@ -63,7 +64,7 @@ Imolecule QMparser::get_molecule(unsigned int mob){
 		file_obj.get_overlap_m();
 		return *file_obj.molecule;
 	}else if (program == "terachem"){
-		orca_files file_obj(name_f);
+		terachem_files file_obj(name_f);
 		file_obj.parse_molden();
 		return *file_obj.molecule;
 	}else{

@@ -46,6 +46,7 @@ class test_p {
 	void test_primordia_1();
 	void test_primordia_2();
 	void test_primordia_3();
+	void test_int_molden();
 };
 
 #endif
