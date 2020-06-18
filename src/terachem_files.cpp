@@ -106,7 +106,7 @@ void terachem_files::parse_molden(){
 				molecule->atoms[n_at_gto-1].add_orbital(orbY);
 				molecule->atoms[n_at_gto-1].add_orbital(orbZ);
 			}
-			else if ( buffer->lines[i].words[0] == "p"){
+			else if ( buffer->lines[i].words[0] == "d"){
 				Iaorbital orbXX,orbYY,orbZZ,orbXY,orbXZ,orbYZ;
 				orbXX.gto		= true;
 				orbXX.symmetry	= "X2";

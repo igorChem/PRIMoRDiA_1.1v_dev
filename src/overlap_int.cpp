@@ -33,8 +33,9 @@ overlap_int::overlap_int(const vector<Iatom>& atoms):
 				atoms[i].orbitals[j].powz;
 			//std::cout << i << " " << j << " " << atoms[i].orbitals[j].symmetry << " " << atoms[i].element << std::endl;
 			if ( atoms[i].orbitals[j].powy == 0 && atoms[i].orbitals[j].powz == 0 ){
-				nAO += 1;
-				nAO += 3*spd -1*spd;
+				if ( spd == 0 ) nAO += 1;
+				if ( spd == 1 ) nAO += 3;
+				if ( spd == 2 ) nAO += 6;
 				if		( atoms[i].orbitals[j].gtos.size() == 1 ){
 					shells.push_back( 
 						{
