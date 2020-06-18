@@ -18,18 +18,23 @@
 #endif
 using libint2::Shell;
 using std::vector;
+using std::cout;
+using std::endl;
 /************************************************/
 overlap_int::overlap_int(){}
 /************************************************/
-overlap_int::overlap_int(const vector<Iatom>& atoms){
+overlap_int::overlap_int(const vector<Iatom>& atoms):
+	nAO(0)											{
 	int spd = 0;
 	for(int i=0;i<atoms.size();i++){
 		for(int j=0;j<atoms[i].orbitals.size();j++){
 			spd=atoms[i].orbitals[j].powx +
 				atoms[i].orbitals[j].powy +
 				atoms[i].orbitals[j].powz;
-			std::cout << i << " " << j << " " << atoms[i].orbitals[j].symmetry << " " << atoms[i].element << std::endl;
+			//std::cout << i << " " << j << " " << atoms[i].orbitals[j].symmetry << " " << atoms[i].element << std::endl;
 			if ( atoms[i].orbitals[j].powy == 0 && atoms[i].orbitals[j].powz == 0 ){
+				nAO += 1;
+				nAO += 3*spd -1*spd;
 				if		( atoms[i].orbitals[j].gtos.size() == 1 ){
 					shells.push_back( 
 						{
@@ -65,7 +70,6 @@ overlap_int::overlap_int(const vector<Iatom>& atoms){
 				}
 			}
 		}
-		
 	}
 	
 	for(unsigned int i=0;i<shells.size();i++ ){
@@ -78,6 +82,10 @@ overlap_int::overlap_int(const vector<Iatom>& atoms){
 		n += shell.size();
 	}
 	
+	m_log->input_message("# of contracted shells: ");
+	m_log->input_message( int( shells.size() ) );
+	m_log->input_message("# of basis functions:	" );
+	m_log->input_message( int(nAO) );
 }
 /************************************************/
 void overlap_int::calculate_overlap(vector<double>& overlap_matrix){
@@ -90,7 +98,10 @@ void overlap_int::calculate_overlap(vector<double>& overlap_matrix){
 		//std::cout << shells[i].nprim() << std::endl;
 	}
 	
-	std::vector<double> matrix_holder(shells.size()*shells.size());
+	vector< vector <double> > matrix_holder(nAO);
+	for(int i=0;i<nAO;i++){
+		matrix_holder[i].resize(nAO);
+	}
 	
 	for (auto shell: shells)
 		for (auto c: shell.contr)
@@ -100,7 +111,6 @@ void overlap_int::calculate_overlap(vector<double>& overlap_matrix){
 	const auto& buf_vec = engine.results();
 	
 	auto ints_shellset = buf_vec[0];
-	
 	for( unsigned int i=0;i<shells.size();i++){
 		for ( unsigned int j=0;j<shells.size();j++){
 			engine.compute(shells[i],shells[j]);
@@ -112,13 +122,19 @@ void overlap_int::calculate_overlap(vector<double>& overlap_matrix){
 			
 			for(int k=0;k<n1;k++){
 				for(int m=0;m<n2;m++){
-					std::cout << "  " << bf1+k << " " << bf2+m << " " << ints_shellset[k*n2+m] << std::endl;
+					//std::cout << "  " << bf1+k << " " << bf2+m << " " << ints_shellset[k*n2+m] << std::endl;
+					matrix_holder[bf1+k][bf2+m] = ints_shellset[k*n2+m];
 				}
 			}
-			//overlap_matrix[j + (i*(i+1))/2]= buf);
 		}
 	}
 	
+	for(int i=0;i<nAO;i++){
+		for(int j=0;j<=i;j++){
+			//std::cout << i <<  " " << j << " " << matrix_holder[i][j] << std::endl;
+			overlap_matrix.push_back( matrix_holder[i][j]);
+		}
+	}
 	
 	libint2::finalize();
 	

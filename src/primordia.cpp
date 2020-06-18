@@ -79,9 +79,9 @@ primordia& primordia::operator=(primordia&& pr_rhs) noexcept{
 /***************************************************************************************/
 primordia operator-(const primordia& pr_lhs, const primordia& pr_rhs){
 	primordia Result(pr_lhs);
-	*Result.grd		= *pr_lhs.grd			- *pr_rhs.grd;
-	*Result.lrdVol	= *pr_lhs.lrdVol		- *pr_rhs.lrdVol;
-	*Result.lrdCnd	= *pr_lhs.lrdCnd	- *pr_rhs.lrdCnd;
+	*Result.grd		= *pr_lhs.grd	 - *pr_rhs.grd;
+	*Result.lrdVol	= *pr_lhs.lrdVol - *pr_rhs.lrdVol;
+	*Result.lrdCnd	= *pr_lhs.lrdCnd - *pr_rhs.lrdCnd;
 	return Result;
 }
 /*************************************************************************************/
@@ -104,7 +104,7 @@ void primordia::init_FOA(const char* file_neutro	,
 	m_log->input_message("local hardness method: "+loc_hard);
 	//-------------------------------------------------------------------
 	
-	unique_ptr<QMparser>	qmfile( new QMparser(file_neutro,program) ); 
+	unique_ptr<QMparser> qmfile( new QMparser(file_neutro,program) ); 
 	Imolecule molecule( qmfile->get_molecule(0) ) ; 
 	qmfile.reset(nullptr);
 	
@@ -115,6 +115,7 @@ void primordia::init_FOA(const char* file_neutro	,
 	
 	grd.reset( new global_rd(molecule) );
 	grd->calculate_rd();
+	//grd->print_rd();
 	grd->write_rd();
 	lrdCnd.reset( new local_rd_cnd( move(molecule) ) );
 	lrdCnd->calculate_Fukui();

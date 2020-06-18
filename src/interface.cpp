@@ -333,6 +333,23 @@ void interface::write_input(){
 								<< 0 << " " <<  0  << " " <<  0  << " " << 0 << " " << band_method << " " <<mep << endl;
 				}
 			}
+		}
+		else if (program == "terachem"){
+			if ( check_file_ext(".molden",fnames[i].c_str()) ){
+				if ( option == 1 )
+					inp_file << option << " " << fnames[i] << " " <<	lh << " " << grid << " " << program << " " << mep << endl;
+				if ( option == 2 ){
+					inp_file << option	<< " " << fnames[i] 
+								<< " "	<<	change_extension(fnames[i].c_str(),"_cat.out")	<< " "
+								<< " "	<<	change_extension(fnames[i].c_str(),"_an.out")	<< " "
+								<< lh	<<	" " << grid 	<< " " << 1 << " " << program << " " << mep << endl;
+				}
+				if ( option == 3 ){
+					inp_file << option << " " << fnames[i] << " " <<	lh << " " << grid << " " << band << " " << " "
+								<< change_extension(fnames[i].c_str(),".pdb") << " " << program << " " << " "
+								<< 0 << " " <<  0  << " " <<  0  << " " << 0 << " " << band_method << " " <<mep << endl;
+				}
+			}		
 		}else{
 				cout << "No program keyword recognized!" << endl;
 				exit(-1);

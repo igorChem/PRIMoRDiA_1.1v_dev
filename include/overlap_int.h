@@ -18,6 +18,7 @@ class Iatom;
 //--------------------------------------
 class overlap_int{
 	public:
+		unsigned int nAO; 
 		std::vector<libint2::Shell> shells;
 		std::vector<int> shell_map;
 		std::vector<int> shell_size;

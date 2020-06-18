@@ -16,17 +16,7 @@
 #include "../include/Iatom.h"
 #include "../include/Imolecule.h"
 
-/*
-// Eigen matrix algebra library
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
 
-// Libint Gaussian integrals library
-#include <libint2.hpp>
-#if !LIBINT2_CONSTEXPR_STATICS
-#  include <libint2/statics_definition.h>
-#endif
-*/
 //--------------------------------------------------------
 using std::cout; 
 using std::endl;
@@ -440,8 +430,8 @@ void Imolecule::update(){
 		}
 	}
 	//------------------------------------------
-	f_chg				= std::round(mol_charge);
-	num_of_atoms	= atoms.size();
+	f_chg		= std::round(mol_charge);
+	num_of_atoms= atoms.size();
 	this->get_ao_number();
 	unsigned int noe	= num_of_electrons;
 	int i;

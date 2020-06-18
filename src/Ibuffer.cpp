@@ -27,13 +27,13 @@ Ibuffer::Ibuffer(const char* file_name		,
 	nLines(0)											,
 	name(file_name)								{
 	
-	char tmp_line[1024];
+	char tmp_line[512];
 	if ( parse ){
 		if ( IF_file(file_name) ){
 			ifstream buf(file_name);
 			name  = file_name;
 			while( !buf.eof() ){
-				buf.getline(tmp_line,1024);
+				buf.getline(tmp_line,512);
 				lines.emplace_back( tmp_line );
 				nLines++;
 			}
@@ -52,7 +52,7 @@ Ibuffer::Ibuffer(const char* file_name		,
 			ifstream buf(file_name);
 			name = file_name;
 			while( !buf.eof() ){
-				buf.getline(tmp_line,1024);
+				buf.getline(tmp_line,512);
 				nLines++;
 			}
 			buf.close();
@@ -74,12 +74,12 @@ Ibuffer::Ibuffer(const char* file_name	,
 	
 	int in_indx  = in;
 	int fin_indx = fin;
-	char tmp_line[1024];
+	char tmp_line[512];
 	
 	if ( IF_file(file_name) ){
 		ifstream buf(file_name);
 		while( !buf.eof() ){
-			buf.getline(tmp_line,1024);
+			buf.getline(tmp_line,512);
 			if ( nLines > in_indx && nLines < fin_indx  ){
 				lines.emplace_back( move (tmp_line) );
 			}
@@ -106,12 +106,12 @@ Ibuffer::Ibuffer(const char* file_name	,
 		
 	int in_indx  = -1;
 	int fin_indx = 0;
-	char tmp_line[1024];
+	char tmp_line[512];
 		
 	if ( IF_file(file_name) ){
 		std::ifstream buf(file_name);
 		while( !buf.eof() ){
-			buf.getline(tmp_line,1024);
+			buf.getline(tmp_line,512);
 			Iline Line(tmp_line);
 			if ( in_indx == -1 ){
 				if ( Line.IF_word( wrdin,0,wrdin.size() ) ){
@@ -144,12 +144,12 @@ Ibuffer::Ibuffer(const char* file_name  ,
 	
 	int in_indx  = -1;
 	int fin_indx = 0;
-	char tmp_line[1024];
+	char tmp_line[512];
 	
 	if ( IF_file(file_name) ){
 		ifstream buf(file_name);
 		while( !buf.eof() ){
-			buf.getline(tmp_line,1024);
+			buf.getline(tmp_line,512);
 			Iline Line (tmp_line);
 			if ( in_indx == -1 ){
 				for(unsigned int i=0;i<wrds_in.size(); i++){
@@ -176,7 +176,7 @@ Ibuffer::Ibuffer(const char* file_name  ,
 			nLines = 0;
 			int real_nlines = 0;
 			while( !buf2.eof() ){
-				buf2.getline(tmp_line,1024);
+				buf2.getline(tmp_line,512);
 				if ( nLines > in_indx && nLines < fin_indx  ){
 					lines.emplace_back( tmp_line );
 					real_nlines++;
