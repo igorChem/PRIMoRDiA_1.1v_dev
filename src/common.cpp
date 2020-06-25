@@ -95,7 +95,9 @@ string double_to_string(double val){
 	return result;
 }
 /*********************************************************************************/
-bool IF_file(const char* name){ return ( access( name, F_OK ) != -1 );}
+bool IF_file(const char* name){
+ return ( access( name, F_OK ) != -1 );
+}
 /*********************************************************************************/
 bool check_file_ext(string extension,const char* file_name){
 	string fname = file_name;

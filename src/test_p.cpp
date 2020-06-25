@@ -94,6 +94,7 @@ test_p::test_p(){
 	gamess_log.push_back(teste_folder2+"trp_an_dft.log"); //#8
 	molden.push_back(teste_folder5+"alanina.molden");
 	molden.push_back(teste_folder5+"frame_1.molden");
+	molden.push_back(teste_folder5+"primordia.input");
 	
 }
 /**********************************************************************************/
@@ -143,8 +144,9 @@ void test_p::test_primordia_3(){
 void test_p::test_int_molden(){
 	//QMparser parse_terachem(molden[0].c_str(),"terachem");
 	//parse_terachem.get_molecule(0);
-	primordia mold;
-	mold.init_FOA(molden[1].c_str(),0,"mepEE",true,"terachem");
+	//primordia mold;
+	//mold.init_FOA(molden[1].c_str(),0,"mepEE",true,"terachem");
+	AutoPrimordia test(molden[2].c_str());
 };
 
 test_p::~test_p(){}

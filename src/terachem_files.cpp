@@ -174,16 +174,20 @@ void terachem_files::parse_molden(){
 	m_log->input_message( int(molecule->num_of_electrons));
 	m_log->input_message("# of energy levels: ");
 	m_log->input_message( int(molecule->MOnmb) );
+	for( int i=0;i<molecule->orb_energies.size();i++){
+		molecule->orb_energies[i] *= 27.2114; 
+	}
 	m_log->input_message("# of molecular orbital coefficients: ");
 	molecule->ang_to_bohr();
 	m_log->input_message("Starting do calculate the overlap 1e matrix: ");
 	overlap_int overlap_integrals(molecule->atoms);
 	overlap_integrals.calculate_overlap(molecule->m_overlap);
+	
 	molecule->bohr_to_ang();
 	molecule->update();
 	if ( !molecule->check() ){ 
 		cout << "Problems in reading the .molden file: " << name_f << endl;
-	}
+	}	
 	molecule->norm_orbs();
 	m_log->input_message("Electronic energy: ");
 	m_log->input_message( double_to_string(molecule->energy_tot) );

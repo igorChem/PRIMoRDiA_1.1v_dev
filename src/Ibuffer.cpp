@@ -139,7 +139,7 @@ Ibuffer::Ibuffer(const char* file_name	,
 Ibuffer::Ibuffer(const char* file_name  , 
 				vector<string>& wrds_in  	,
 				vector<string>& wrds_fin )	:
-	nLines(0)										,
+	nLines(0)							,
 	name(file_name)							{
 	
 	int in_indx  = -1;
